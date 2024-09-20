@@ -22,6 +22,7 @@ interface SignUpCardProps {
 
 const SignUpCard = ({ setState }: SignUpCardProps) => {
   const { signIn } = useAuthActions();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -43,7 +44,7 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
 
     setPending(true);
 
-    signIn("password", { email, password, passwordConfirm, flow: "signUp" })
+    signIn("password", { name, email, password, passwordConfirm, flow: "signUp" })
       .catch(() => {
         setError("Something went wrong");
       })
@@ -64,16 +65,28 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
       <CardContent className="space-y-5 px-0 pb-0">
         <form className="flex flex-col space-y-3" onSubmit={onPasswordSignUp}>
           <Input
+            name="name"
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={pending}
+            required
+          />
+          <Input
             name="email"
             type="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={pending}
             required
           />
+
           <Input
             name="password"
             type="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={pending}
@@ -82,6 +95,7 @@ const SignUpCard = ({ setState }: SignUpCardProps) => {
           <Input
             name="passwordConfirm"
             type="password"
+            placeholder="Confirm Password"
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
             disabled={pending}
