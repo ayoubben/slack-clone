@@ -22,7 +22,7 @@ const WorkspaceSwitcher = () => {
   });
   const { data: workspaces, isLoading: workspacesLoading } = useGetWorkspaces();
 
-  const filtredWorkspaces = workspaces?.filter((w) => w._id !== workspaceId);
+  const filtredWorkspaces = workspaces?.filter((w) => w?._id !== workspaceId);
 
   return (
     <DropdownMenu>
@@ -51,14 +51,14 @@ const WorkspaceSwitcher = () => {
         <Separator />
         {filtredWorkspaces?.map((w) => (
           <DropdownMenuItem
-            key={w._id}
-            onClick={() => router.push(`/workspace/${w._id}`)}
+            key={w?._id}
+            onClick={() => router.push(`/workspace/${w?._id}`)}
             className="flex items-center justify-start gap-3 p-2 capitalize rounded-md cursor-pointer hover:bg-slate-100 focus-visible:outline-none"
           >
             <div className="font-semibold  bg-slate-200 text-black px-2.5 py-2 rounded-md">
-              <span>{w.name.charAt(0).toUpperCase()}</span>
+              <span>{w?.name.charAt(0).toUpperCase()}</span>
             </div>
-            <span className="truncate">{w.name}</span>
+            <span className="truncate">{w?.name}</span>
           </DropdownMenuItem>
         ))}
         <DropdownMenuItem

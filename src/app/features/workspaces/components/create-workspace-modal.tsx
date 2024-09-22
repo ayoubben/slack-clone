@@ -44,23 +44,21 @@ export const CreateWorkspaceModal = () => {
         <DialogHeader>
           <DialogTitle>Add a workspace</DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <Input
-              name="name"
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              disabled={isPending}
-            />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <Input
+            name="name"
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            disabled={isPending}
+          />
 
-            <Button type="submit" className="w-full" disabled={isPending}>
-              Create
-            </Button>
-          </form>
-        </DialogDescription>
+          <Button type="submit" className="w-full" disabled={isPending}>
+            Create
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );
