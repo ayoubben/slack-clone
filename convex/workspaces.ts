@@ -23,7 +23,6 @@ export const get = query({
       return [];
     }
 
-    console.log("userId", userId);
     const members = await ctx.db
       .query("members")
       .withIndex("by_user_id", (q) => q.eq("userId", userId))
