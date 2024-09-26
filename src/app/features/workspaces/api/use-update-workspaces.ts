@@ -11,23 +11,23 @@ type Options = {
   throwError?: boolean;
 };
 
-type RequestType = {name: string;};
-
+type RequestType = {
+  name: string;
+  id: Id<"workspaces">;
+};
 type ResponseType = Id<"workspaces"> | null;
 
-
-export const useCreateWorkspace = () => {
+export const useUpdateWorkspace = () => {
   const [status, setStatus] = useState<"success" | "error" | "settled" | "pending" | null>(null);
 
   const [data, setData] = useState<ResponseType>(null);
   const [error, setError] = useState<Error | null>(null);
-  const mutation = useMutation(api.workspaces.create);
+  const mutation = useMutation(api.workspaces.update);
 
   const isPending = useMemo(() => status === "pending", [status]);
   const isSuccess = useMemo(() => status === "success", [status]);
   const isError = useMemo(() => status === "error", [status]);
   const isSettled = useMemo(() => status === "settled", [status]);
-
 
   const mutate = useCallback(async (values: RequestType, options?: Options) => {
     try {
