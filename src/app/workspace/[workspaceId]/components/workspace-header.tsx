@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ListFilter, SquarePen } from "lucide-react";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import { Separator } from "@/components/ui/separator";
 import WorkspacePreferences from "./workspace-preferences-modal";
@@ -69,6 +69,14 @@ export const WorkspaceHeader = ({ workspace, isAdmin }: WorkspaceHeaderProps) =>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      <div className="flex items-center gap-0.5">
+        <Button variant="transparent" size="iconSm">
+          <ListFilter className="size-4" /> {/* Error: Cannot find name 'F' */}
+        </Button>
+        <Button variant="transparent" size="iconSm">
+          <SquarePen className="size-4" />
+        </Button>
+      </div>
     </>
   );
 };

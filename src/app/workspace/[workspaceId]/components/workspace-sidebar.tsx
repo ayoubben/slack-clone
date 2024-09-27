@@ -1,9 +1,21 @@
 import { useCurrentMember } from "@/app/features/members/api/use-current-member";
 import { useGetWorkspace } from "@/app/features/workspaces/api/use-get-workspace";
 import { useWorkspaceId } from "@/app/hooks/use-workspace-id";
-import { AlertTriangle, Loader2, Loader, ListFilter, SquarePen } from "lucide-react";
+import {
+  AlertTriangle,
+  HashIcon,
+  Loader,
+  MessageCircle,
+  MessageCircleWarning,
+  MessagesSquare,
+} from "lucide-react";
 import { WorkspaceHeader } from "./workspace-header";
 import { Button } from "@/components/ui/button";
+import SidebarItem from "./sidebar-item";
+import { useGetChannels } from "@/app/features/channels/api/use-get-channels";
+import WorkspaceSection from "./workspace-section";
+import { useGetMembers } from "@/app/features/members/api/use-get-members";
+import SidebarUser from "./sidebar-user";
 
 export const WorkspaceSidebar = () => {
   const workspaceId = useWorkspaceId();
@@ -11,6 +23,9 @@ export const WorkspaceSidebar = () => {
   const { data: workspace, isLoading: workspaceLoading } = useGetWorkspace({
     id: workspaceId,
   });
+
+  const { data: channels, isLoading: channelsLoading } = useGetChannels({ workspaceId });
+  const { data: members, isLoading: membersLoading } = useGetMembers({ workspaceId });
 
   if (memberLoading || workspaceLoading) {
     return (
@@ -33,15 +48,42 @@ export const WorkspaceSidebar = () => {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex justify-between gap-4 grow-1">
         <WorkspaceHeader workspace={workspace} isAdmin={member?.role === "admin"} />
-        <div className="flex items-center gap-0.5">
-          <Button variant="transparent" size="iconSm">
-            <ListFilter className="size-4" /> {/* Error: Cannot find name 'F' */}
-          </Button>
-          <Button variant="transparent" size="iconSm">
-            <SquarePen className="size-4" />
-          </Button>
-        </div>
       </div>
+      <div className="flex flex-col gap-3">
+        <SidebarItem
+          id="threads"
+          label="threads"
+          icon={MessagesSquare}
+          variant="default"
+        />
+        <SidebarItem
+          id="drafts"
+          label="drafts & sent"
+          icon={MessageCircle}
+          variant="active"
+        />
+      </div>
+
+      <WorkspaceSection label="channels" onNew={() => {}}>
+        {channels?.map((item) => {
+          return (
+            <SidebarItem key={item._id} id={item._id} label={item.name} icon={HashIcon} />
+          );
+        })}
+      </WorkspaceSection>
+
+      <WorkspaceSection label="Direct messages" onNew={() => {}}>
+        {members?.map((item) => {
+          return (
+            <SidebarUser
+              key={item._id}
+              id={item._id}
+              label={item.user.name}
+              image={item.user.image}
+            />
+          );
+        })}
+      </WorkspaceSection>
     </div>
   );
 };
