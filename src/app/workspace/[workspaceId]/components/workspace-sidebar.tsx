@@ -10,15 +10,16 @@ import {
   MessagesSquare,
 } from "lucide-react";
 import { WorkspaceHeader } from "./workspace-header";
-import { Button } from "@/components/ui/button";
 import SidebarItem from "./sidebar-item";
 import { useGetChannels } from "@/app/features/channels/api/use-get-channels";
 import WorkspaceSection from "./workspace-section";
 import { useGetMembers } from "@/app/features/members/api/use-get-members";
 import SidebarUser from "./sidebar-user";
+import { useCreateChannelModal } from "@/app/features/channels/store/use-create-channel-modal";
 
 export const WorkspaceSidebar = () => {
   const workspaceId = useWorkspaceId();
+  const [_open, setOpen] = useCreateChannelModal();
   const { data: member, isLoading: memberLoading } = useCurrentMember({ workspaceId });
   const { data: workspace, isLoading: workspaceLoading } = useGetWorkspace({
     id: workspaceId,
@@ -64,7 +65,7 @@ export const WorkspaceSidebar = () => {
         />
       </div>
 
-      <WorkspaceSection label="channels" onNew={() => {}}>
+      <WorkspaceSection label="channels" onNew={() => setOpen(true)}>
         {channels?.map((item) => {
           return (
             <SidebarItem key={item._id} id={item._id} label={item.name} icon={HashIcon} />
