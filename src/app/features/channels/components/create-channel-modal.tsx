@@ -1,11 +1,5 @@
 "use client";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,9 +7,11 @@ import { toast } from "sonner";
 import { useCreateChannel } from "../api/use-create-channel";
 import { useCreateChannelModal } from "../store/use-create-channel-modal";
 import { useWorkspaceId } from "@/app/hooks/use-workspace-id";
+import { useRouter } from "next/navigation";
 
 export const CreateChannelModal = () => {
   const workspaceId = useWorkspaceId();
+  const router = useRouter();
   const { mutate, isPending } = useCreateChannel();
 
   const [open, setOpen] = useCreateChannelModal();
@@ -31,8 +27,13 @@ export const CreateChannelModal = () => {
       { name, workspaceId },
       {
         onSuccess(id) {
-          handleClose();
           toast.success("Channel created");
+          handleClose();
+          router.push(`/workspace/${workspaceId}/channel/${id}`);
+        },
+
+        onError() {
+          toast.error("Something went wrong");
         },
       }
     );

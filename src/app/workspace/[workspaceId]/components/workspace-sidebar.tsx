@@ -6,7 +6,6 @@ import {
   HashIcon,
   Loader,
   MessageCircle,
-  MessageCircleWarning,
   MessagesSquare,
 } from "lucide-react";
 import { WorkspaceHeader } from "./workspace-header";
@@ -16,9 +15,11 @@ import WorkspaceSection from "./workspace-section";
 import { useGetMembers } from "@/app/features/members/api/use-get-members";
 import SidebarUser from "./sidebar-user";
 import { useCreateChannelModal } from "@/app/features/channels/store/use-create-channel-modal";
+import { useChannelId } from "@/app/hooks/use-channel-id";
 
 export const WorkspaceSidebar = () => {
   const workspaceId = useWorkspaceId();
+  const channelId = useChannelId();
   const [_open, setOpen] = useCreateChannelModal();
   const { data: member, isLoading: memberLoading } = useCurrentMember({ workspaceId });
   const { data: workspace, isLoading: workspaceLoading } = useGetWorkspace({
@@ -61,14 +62,20 @@ export const WorkspaceSidebar = () => {
           id="drafts"
           label="drafts & sent"
           icon={MessageCircle}
-          variant="active"
+          variant="default"
         />
       </div>
 
       <WorkspaceSection label="channels" onNew={() => setOpen(true)}>
         {channels?.map((item) => {
           return (
-            <SidebarItem key={item._id} id={item._id} label={item.name} icon={HashIcon} />
+            <SidebarItem
+              key={item._id}
+              id={item._id}
+              label={item.name}
+              icon={HashIcon}
+              variant={item._id === channelId ? "active" : "default"}
+            />
           );
         })}
       </WorkspaceSection>
