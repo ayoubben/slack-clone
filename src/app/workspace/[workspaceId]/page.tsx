@@ -65,7 +65,7 @@ const WorkspacePage = () => {
     );
   }
 
-  if (!workspace) {
+  if (!workspace || !member) {
     return (
       <div className="flex flex-col items-center justify-center gap-8 h-full">
         <TriangleAlert className="size-5" />
