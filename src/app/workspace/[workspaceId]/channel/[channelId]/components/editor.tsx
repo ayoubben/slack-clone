@@ -8,6 +8,7 @@ import { Smile, ImageIcon } from "lucide-react";
 import { Hint } from "@/components/hint";
 import { Delta, Op, QuillOptions } from "quill/core";
 import { cn } from "@/lib/utils";
+import EmojiPopover from "@/components/emoji-popover";
 
 type EditorValue = {
   image: File | null;
@@ -116,7 +117,13 @@ const Editor = ({
     };
   }, []);
 
+  const onEmojiSelected = (emoji: any) => {
+    const quill = quillRef.current;
+    quill?.insertText(quill.getSelection()?.index || 0, emoji.native);
+  };
+
   const isEmpty = text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+
   const toggleToolbar = () => {
     setIsToolbarVisible((current) => !current);
     const toolbarElement = containerRef.current?.querySelector(".ql-toolbar");
@@ -125,7 +132,6 @@ const Editor = ({
     }
   };
 
-  console.log({ isEmpty, text });
   return (
     <div className="flex flex-col">
       <div className="flex flex-col  border border-slate-200  rounded-md overflow-hidden bg-white focus-within:shadow-sm">
@@ -141,16 +147,11 @@ const Editor = ({
               <PiTextAa className="size-4" />
             </Button>
           </Hint>
-          <Hint label="Emojies">
-            <Button
-              disabled={disabled}
-              size="iconSm"
-              variant={"ghost"}
-              onClick={() => {}}
-            >
+          <EmojiPopover onEmojiSelected={onEmojiSelected}>
+            <Button disabled={disabled} size="iconSm" variant={"ghost"}>
               <Smile className="size-4" />
             </Button>
-          </Hint>
+          </EmojiPopover>
           {variant === "create" && (
             <Hint label="Image">
               <Button
@@ -202,11 +203,18 @@ const Editor = ({
           )}
         </div>
       </div>
-      <div className="p-2 text-[11px] text-muted-foreground flex justify-end">
-        <p>
-          <strong>Shift + Return</strong> to add a new line
-        </p>
-      </div>
+      {variant === "create" && (
+        <div
+          className={cn(
+            "p-2 text-[11px] text-muted-foreground flex justify-end opacity-0 transition",
+            !isEmpty && "opacity-100"
+          )}
+        >
+          <p>
+            <strong>Shift + Return</strong> to add a new line
+          </p>
+        </div>
+      )}
     </div>
   );
 };
