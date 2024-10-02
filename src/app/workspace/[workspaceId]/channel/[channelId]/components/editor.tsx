@@ -74,7 +74,19 @@ const Editor = ({
             enter: {
               key: "Enter",
               handler: () => {
-                return;
+                const text = quill.getText();
+                const addedImage = imageElementRef.current?.files?.[0] || null;
+
+                const isEmpty =
+                  !addedImage && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+
+                if (isEmpty) return;
+                const body = JSON.stringify(quill.getContents());
+
+                submitRef.current?.({
+                  body,
+                  image: addedImage,
+                });
               },
             },
             shift_enter: {
@@ -125,7 +137,7 @@ const Editor = ({
     quill?.insertText(quill.getSelection()?.index || 0, emoji.native);
   };
 
-  const isEmpty = text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+  const isEmpty = !image && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
 
   const toggleToolbar = () => {
     setIsToolbarVisible((current) => !current);
@@ -144,7 +156,12 @@ const Editor = ({
         onChange={(event) => setImage(event.target.files![0])}
         className="hidden"
       />
-      <div className="flex flex-col  border border-slate-200  rounded-md overflow-hidden bg-white focus-within:shadow-sm">
+      <div
+        className={cn(
+          "flex flex-col  border border-slate-200  rounded-md overflow-hidden bg-white focus-within:shadow-sm",
+          disabled && "opacity-50"
+        )}
+      >
         <div ref={containerRef} className="w-full ql-custom" />
         {!!image && (
           <div className="p-2">
@@ -211,7 +228,7 @@ const Editor = ({
               <Button
                 className=" bg-[#007a5a] hover:bg-[#007a5a]/80 text-white"
                 size="sm"
-                onClick={() => {}}
+                onClick={onCancel}
                 disabled={disabled || isEmpty}
               >
                 Save
@@ -229,7 +246,9 @@ const Editor = ({
               disabled={disabled || isEmpty}
               size="iconSm"
               variant={"ghost"}
-              onClick={() => {}}
+              onClick={() =>
+                onSubmit({ image, body: JSON.stringify(quillRef.current?.getContents()) })
+              }
             >
               <MdSend className="size-4" />
             </Button>
