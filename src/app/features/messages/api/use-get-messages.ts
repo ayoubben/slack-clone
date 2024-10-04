@@ -18,7 +18,7 @@ export const useGetMessages = ({
   conversationId,
   parentMessageId,
 }: UseGetMessagesProps) => {
-  const { results, status , loadMore} = usePaginatedQuery(api.messages.get, 
+  const { results, status , loadMore } = usePaginatedQuery(api.messages.get, 
     {
       channelId,
       conversationId,

@@ -130,7 +130,8 @@ export const get = query({
               })[]
             );
 
-            const reactionWithoutMemberIdProperty = dedupeReactions.map((memberId, ...rest) => rest)
+            const reactionWithoutMemberIdProperty = dedupeReactions.map(({ memberId, ...rest }) => rest);
+
             return {
               ...message,
               image,
