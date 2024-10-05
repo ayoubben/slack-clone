@@ -1,6 +1,11 @@
 import { GetMessagesReturnType } from "@/app/features/messages/api/use-get-messages";
 import { differenceInMinutes, format, isToday, isYesterday } from "date-fns";
 import { Message } from "./message";
+import { HashIcon } from "lucide-react";
+import { useState } from "react";
+import { Id } from "../../../../../../../convex/_generated/dataModel";
+import { useWorkspaceId } from "@/app/hooks/use-workspace-id";
+import { useCurrentMember } from "@/app/features/members/api/use-current-member";
 
 interface MessageListProps {
   memberName?: string;
@@ -27,6 +32,10 @@ const MessageList = ({
   isLoadingMore,
   canLoadMore,
 }: MessageListProps) => {
+  const [editingId, setEditingId] = useState<Id<"messages"> | null>(null);
+  const workspaceId = useWorkspaceId();
+  const { data: currentMember } = useCurrentMember({ workspaceId });
+
   const formatDateLabel = (dateStr: string) => {
     const date = new Date(dateStr);
     if (isToday(date)) return "Today";
@@ -47,50 +56,62 @@ const MessageList = ({
     {} as Record<string, typeof data>
   );
   return (
-    <div className="flex-1 flex flex-col-reverse pb-4 overflow-y-auto messages-scrollbar">
-      {Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
-        <div key={dateKey}>
-          <div className="text-center my-2 relative">
-            <hr className="absolute top-1/2 left-0 right-0 border-t border-gray-300" />
-            <span className="relative inline-block bg-white px-4 py-1 rounded-full text-xs border border-gray-300 shadow-sm">
-              {formatDateLabel(dateKey)}
-            </span>
-          </div>
-          {messages.map((message, index) => {
-            const prevMessage = messages[index - 1];
-            const isCompact =
-              prevMessage &&
-              prevMessage.user?._id === message.user?._id &&
-              differenceInMinutes(
-                new Date(prevMessage._creationTime),
-                new Date(message._creationTime)
-              ) < TIME_THRESHOLD;
-            return (
-              <Message
-                key={message._id}
-                id={message._id}
-                memberId={message.memberId}
-                authorImage={message?.user?.image}
-                authorName={message?.user?.name}
-                isAuthor={false}
-                reactions={message.reactions}
-                body={message.body}
-                image={message.image}
-                updatedAt={message.updateAt}
-                createdAt={message._creationTime}
-                isEditing={false}
-                setEditingId={() => {}}
-                isCompact={isCompact}
-                hideTheadButton={false}
-                threadCount={message.threadCount}
-                threadImage={message.threadImage}
-                threadTimestamp={message.threadTimestamp}
-              />
-            );
-          })}
+    <>
+      <div className="flex flex-col px-5 py-2 gap-2">
+        <div className="flex gap-2 items-center">
+          <HashIcon className="size-6" />
+          <span className="truncate font-bold text-2xl">{channelName}</span>
         </div>
-      ))}
-    </div>
+        <div className="text-sm text-muted-foreground">
+          This channel was crated on{" "}
+          {format(new Date(channelCreationTime!), "yyyy-MM-dd hh:mm")}.
+        </div>
+      </div>
+      <div className="flex-1 flex flex-col-reverse pb-4 overflow-y-auto messages-scrollbar">
+        {Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
+          <div key={dateKey}>
+            <div className="text-center my-2 relative">
+              <hr className="absolute top-1/2 left-0 right-0 border-t border-gray-300" />
+              <span className="relative inline-block bg-white px-4 py-1 rounded-full text-xs border border-gray-300 shadow-sm">
+                {formatDateLabel(dateKey)}
+              </span>
+            </div>
+            {messages.map((message, index) => {
+              const prevMessage = messages[index - 1];
+              const isCompact =
+                prevMessage &&
+                prevMessage.user?._id === message.user?._id &&
+                differenceInMinutes(
+                  new Date(prevMessage._creationTime),
+                  new Date(message._creationTime)
+                ) < TIME_THRESHOLD;
+              return (
+                <Message
+                  key={message._id}
+                  id={message._id}
+                  memberId={message.memberId}
+                  authorImage={message?.user?.image}
+                  authorName={message?.user?.name}
+                  isAuthor={message.memberId === currentMember?._id}
+                  reactions={message.reactions}
+                  body={message.body}
+                  image={message.image}
+                  updatedAt={message.updateAt}
+                  createdAt={message._creationTime}
+                  isEditing={editingId === message._id}
+                  setEditingId={setEditingId}
+                  isCompact={isCompact}
+                  hideTheadButton={variant === "thread"}
+                  threadCount={message.threadCount}
+                  threadImage={message.threadImage}
+                  threadTimestamp={message.threadTimestamp}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
