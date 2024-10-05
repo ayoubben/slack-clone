@@ -96,7 +96,7 @@ const MessageList = ({
                   reactions={message.reactions}
                   body={message.body}
                   image={message.image}
-                  updatedAt={message.updateAt}
+                  updatedAt={message.updatedAt}
                   createdAt={message._creationTime}
                   isEditing={editingId === message._id}
                   setEditingId={setEditingId}

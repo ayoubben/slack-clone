@@ -12,7 +12,7 @@ import EmojiPopover from "@/components/emoji-popover";
 import Image from "next/image";
 
 type EditorValue = {
-  image: File | null;
+  image?: File | null;
   body: string;
 };
 
@@ -220,7 +220,7 @@ const Editor = ({
               <Button
                 variant={"outline"}
                 size="sm"
-                onClick={() => {}}
+                onClick={onCancel}
                 disabled={disabled}
               >
                 Cancel
@@ -228,7 +228,9 @@ const Editor = ({
               <Button
                 className=" bg-[#007a5a] hover:bg-[#007a5a]/80 text-white"
                 size="sm"
-                onClick={onCancel}
+                onClick={() =>
+                  onSubmit({ body: JSON.stringify(quillRef.current?.getContents()) })
+                }
                 disabled={disabled || isEmpty}
               >
                 Save

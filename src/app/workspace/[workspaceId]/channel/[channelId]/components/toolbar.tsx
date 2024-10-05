@@ -62,7 +62,7 @@ const Toolbar = ({
                 variant="ghost"
                 size="iconSm"
                 disabled={isPending}
-                onClick={handleEdit}
+                onClick={handleDelete}
               >
                 <Trash className="size-4" />
               </Button>
