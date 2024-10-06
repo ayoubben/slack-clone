@@ -10,6 +10,8 @@ import { useUpdateMessage } from "@/app/features/messages/api/use-update-message
 import { useRemoveMessage } from "@/app/features/messages/api/use-remove-message";
 import { toast } from "sonner";
 import { useConfirm } from "@/app/hooks/use-confirm";
+import { useUpdateReaction } from "@/app/features/reactions/api/use-update-reaction";
+import Reaction from "./reactions";
 
 const Renderer = dynamic(() => import("./Renderer"), { ssr: false });
 const Editor = dynamic(() => import("./editor"), { ssr: false });
@@ -65,6 +67,7 @@ export const Message = ({
   const avatarFallback = authorName?.[0]?.toUpperCase();
   const { mutate: updateMessage, isPending } = useUpdateMessage();
   const { mutate: removeMessage, isPending: isPendingRemove } = useRemoveMessage();
+  const { mutate: updateReaction, isPending: isPendingReaction } = useUpdateReaction();
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete message",
@@ -104,6 +107,17 @@ export const Message = ({
     );
   };
 
+  const handleUpdateReaction = (value: string) => {
+    updateReaction(
+      { messageId: id, value },
+      {
+        onError: () => {
+          toast.error("Something went wrong");
+        },
+      }
+    );
+  };
+
   if (isCompact) {
     return (
       <div
@@ -133,6 +147,9 @@ export const Message = ({
               <>
                 <Renderer value={body} />
                 <Thumbnail url={image} />
+
+                <Reaction reactions={reactions} handleReaction={handleUpdateReaction} />
+
                 {updatedAt ? (
                   <span className="text-xs text-muted-foreground">(Edited)</span>
                 ) : null}
@@ -146,7 +163,7 @@ export const Message = ({
             isPending={isPending || isPendingRemove}
             handleEdit={() => setEditingId(id)}
             handleThread={() => console.log("thread")}
-            handleReaction={() => {}}
+            handleReaction={handleUpdateReaction}
             handleDelete={() => handleRemoveMessage(id)}
             hideTheadButton={hideTheadButton}
           />
@@ -197,6 +214,9 @@ export const Message = ({
             <>
               <Renderer value={body} />
               <Thumbnail url={image} />
+              <div className="flex">
+                <Reaction reactions={reactions} handleReaction={handleUpdateReaction} />
+              </div>
             </>
           )}
           {updatedAt ? (
@@ -204,13 +224,14 @@ export const Message = ({
           ) : null}
         </div>
       </div>
+
       {!isEditing && (
         <Toolbar
           isAuthor={isAuthor}
           isPending={isPending || isPendingRemove}
           handleEdit={() => setEditingId(id)}
           handleThread={() => console.log("thread")}
-          handleReaction={() => {}}
+          handleReaction={handleUpdateReaction}
           handleDelete={() => handleRemoveMessage(id)}
           hideTheadButton={hideTheadButton}
         />

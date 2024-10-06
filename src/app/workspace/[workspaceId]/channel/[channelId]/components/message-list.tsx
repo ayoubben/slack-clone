@@ -1,7 +1,7 @@
 import { GetMessagesReturnType } from "@/app/features/messages/api/use-get-messages";
 import { differenceInMinutes, format, isToday, isYesterday } from "date-fns";
 import { Message } from "./message";
-import { HashIcon } from "lucide-react";
+import { HashIcon, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
 import { useWorkspaceId } from "@/app/hooks/use-workspace-id";
@@ -56,18 +56,8 @@ const MessageList = ({
     {} as Record<string, typeof data>
   );
   return (
-    <>
-      <div className="flex flex-col px-5 py-2 gap-2">
-        <div className="flex gap-2 items-center">
-          <HashIcon className="size-6" />
-          <span className="truncate font-bold text-2xl">{channelName}</span>
-        </div>
-        <div className="text-sm text-muted-foreground">
-          This channel was crated on{" "}
-          {format(new Date(channelCreationTime!), "yyyy-MM-dd hh:mm")}.
-        </div>
-      </div>
-      <div className="flex-1 flex flex-col-reverse pb-4 overflow-y-auto messages-scrollbar">
+    <div className="flex flex-1 flex-col-reverse">
+      <div className="flex flex-col-reverse pb-4 overflow-y-auto messages-scrollbar">
         {Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
           <div key={dateKey}>
             <div className="text-center my-2 relative">
@@ -111,7 +101,41 @@ const MessageList = ({
           </div>
         ))}
       </div>
-    </>
+      {canLoadMore && (
+        <div
+          className="h-1"
+          ref={(el) => {
+            if (el) {
+              const observer = new IntersectionObserver(
+                ([entry]) => {
+                  if (entry.isIntersecting && canLoadMore) {
+                    loadMore();
+                  }
+                },
+                { threshold: 1.0 }
+              );
+              observer.observe(el);
+              return () => observer.disconnect();
+            }
+          }}
+        />
+      )}
+
+      <div className="flex justify-center items-center gap-2 px-5 py-2">
+        {isLoadingMore && <Loader2 className="animate-spin h-5 w-5 " />}
+      </div>
+
+      <div className="flex flex-col px-5 py-2 gap-2">
+        <div className="flex gap-2 items-center">
+          <HashIcon className="size-6" />
+          <span className="truncate font-bold text-2xl">{channelName}</span>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          This channel was crated on{" "}
+          {format(new Date(channelCreationTime!), "yyyy-MM-dd hh:mm")}.
+        </div>
+      </div>
+    </div>
   );
 };
 
